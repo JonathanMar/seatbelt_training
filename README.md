@@ -366,3 +366,101 @@ results = model.predict("frame.jpg", conf=0.5)
 | Type hints | Todos os modulos com anotacoes (`from __future__ import annotations`) |
 | Docstrings | Todos os modulos e funcoes documentados |
 | Encapsulamento | Logica em funcoes; `if __name__ == "__main__"` em todos os scripts |
+
+---
+
+## Inferencia (Teste do Modelo)
+
+Apos o treinamento, use `predict.py` para testar o modelo em imagens,
+videos, webcam ou pastas inteiras. Os resultados sao salvos em `runs/predict/`.
+
+### Instalacao rapida
+
+```bash
+source env/bin/activate
+```
+
+### Imagem
+
+```bash
+# Imagem unica
+python predict.py --source foto.jpg
+
+# Confianca customizada
+python predict.py --source foto.jpg --conf 0.4
+
+# Salvar anotacoes YOLO .txt junto com a imagem
+python predict.py --source foto.jpg --save-txt
+```
+
+Resultado salvo em `runs/predict/exp/foto.jpg` com as bounding boxes desenhadas.
+
+### Video
+
+```bash
+# Video MP4
+python predict.py --source video.mp4
+
+# Com nome de saida customizado
+python predict.py --source video.mp4 --name teste_video
+```
+
+Resultado salvo em `runs/predict/teste_video/video.mp4` com deteccoes frame a frame.
+
+### Webcam ao vivo
+
+```bash
+# Webcam padrao (device 0) com janela ao vivo
+python predict.py --source 0 --show
+
+# Segunda webcam
+python predict.py --source 1 --show
+```
+
+### Pasta de imagens
+
+```bash
+# Todas as imagens do split de teste
+python predict.py --source dataset/test/images/ --name batch_test
+```
+
+### Argumentos disponiveis
+
+| Argumento | Padrao | Descricao |
+|---|---|---|
+| `--source` | obrigatorio | Imagem, video, diretorio, 0 (webcam) ou URL |
+| `--model` | `best.pt` do run atual | Caminho para o modelo `.pt` |
+| `--conf` | `0.45` | Confianca minima para uma deteccao ser considerada |
+| `--iou` | `0.50` | Threshold IoU para NMS |
+| `--imgsz` | `640` | Tamanho de inferencia |
+| `--show` | `False` | Exibe janela ao vivo (requer display) |
+| `--save-txt` | `False` | Salva anotacoes em formato YOLO `.txt` |
+| `--save-conf` | `False` | Inclui score de confianca nos `.txt` |
+| `--name` | `exp` | Nome do subdiretorio em `runs/predict/` |
+| `--device` | GPU (se disponivel) | Device: `0`, `cpu`, `cuda:0` |
+
+### Saida do terminal
+
+```
+============================================================
+  SEATBELT DETECTOR - Inferencia
+============================================================
+  Modelo  : runs/detect/seatbelt_yolov8n/weights/best.pt
+  Source  : video.mp4  [video]
+  Conf    : 0.45   |  IoU: 0.50
+  Device  : 0
+  Saida   : runs/predict/exp/
+============================================================
+
+============================================================
+  RESUMO DAS DETECCOES
+------------------------------------------------------------
+  Frames / imagens processados : 450
+  Pessoas COM cinto            : 312
+  Pessoas SEM cinto            : 47
+  Total de deteccoes           : 359
+  Resultados salvos em         : runs/predict/exp/
+============================================================
+
+  ALERTA: 47 deteccoes sem cinto (13.1% do total)!
+```
