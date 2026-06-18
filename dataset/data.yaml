@@ -1,0 +1,9 @@
+path: .  # raiz do dataset (relativo a data.yaml)
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 2
+names:
+  0: person_without_seatbelt
+  1: person_with_seatbelt

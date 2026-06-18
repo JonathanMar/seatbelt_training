@@ -1,0 +1,23 @@
+# ─── Core ────────────────────────────────────────────────────────────────────
+ultralytics>=8.3.0
+
+# ─── PyTorch (instalar via pip com índice CUDA correto) ──────────────────────
+# Para CUDA 12.x:
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+torch>=2.1.0
+torchvision>=0.16.0
+torchaudio>=2.1.0
+
+# ─── Export / Deploy ─────────────────────────────────────────────────────────
+onnx>=1.15.0
+onnxruntime-gpu>=1.17.0   # inferência ONNX na GPU; trocar por onnxruntime para CPU-only
+onnxsim>=0.4.35           # ONNX Simplifier (usado em export_onnx.py)
+
+# ─── Visão ───────────────────────────────────────────────────────────────────
+opencv-python>=4.9.0
+
+# ─── Dados / Utilidades ──────────────────────────────────────────────────────
+numpy>=1.26.0
+matplotlib>=3.8.0
+pandas>=2.2.0
+pyyaml>=6.0.1
