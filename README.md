@@ -548,28 +548,177 @@ Exemplo de deteccoes do modelo no batch 0 de validacao:
 ![Predicoes val batch 0](docs/results/val_batch0_pred.jpg)
 
 ---
+## Resultados do Treinamento
 
-### Analise dos resultados
+> **Modelo:** YOLOv8n  
+> **Dataset:** 5.840 imagens de treino, 1.110 imagens de validação e 306 imagens de teste  
+> **Hardware:** NVIDIA GeForce RTX 2060 SUPER (7.6 GB VRAM)
 
-**O que funcionou bem:**
-- mAP@50 de **0.823** e Precision de **0.829** indicam um modelo confiavel para deteccao em producao
-- Classe `without_seatbelt` com mAP@50 = **0.855**: o modelo e mais preciso identificando risco
-- Velocidade de **~3 ms/imagem** na GPU permite inferencia em tempo real (video a 30 FPS com ampla margem)
-- Early stopping na epoca 44 indica convergencia saudavel sem overfitting
+### Resumo da Execução
 
-**Pontos de atencao:**
-- `person_with_seatbelt` tem mAP50-95 menor (0.417 vs 0.483): o cinto e ocluido em algumas angulacoes
-- Recall de 0.805: ~20% das deteccoes sao perdidas — aceitavel para um modelo nano (3M params)
+| Parâmetro | Valor |
+|-----------|--------|
+| Épocas configuradas | 150 |
+| Épocas executadas | **74** |
+| Melhor época | **44** |
+| Early Stopping | Ativado (30 épocas sem melhoria) |
+| Tempo total de treinamento | **1,225 horas (~73,5 minutos)** |
+| Tamanho do modelo (`best.pt`) | **6,3 MB** |
+| Framework | Ultralytics 8.4.35 + PyTorch 2.11 + CUDA 13.0 |
 
-**Para melhorar:**
-- Modelo maior: `yolov8s.pt` ou `yolov8m.pt` com mais dados
-- Mais dados de `person_with_seatbelt` em angulos laterais/traseiros
-- Aumentar `PATIENCE` para 50+ se quiser explorar mais epocas
+---
 
-### Como reproduzir
+### Métricas Finais (Validação)
 
-```bash
-python train.py
-# EarlyStopping ativa automaticamente
-# best.pt salvo em: runs/detect/seatbelt_yolov8n/weights/best.pt
+#### Desempenho Geral
+
+| Métrica | Valor |
+|---------|--------|
+| Precision | **82,9%** |
+| Recall | **80,5%** |
+| mAP@50 | **82,3%** |
+| mAP@50-95 | **45,0%** |
+
+#### Desempenho por Classe
+
+| Classe | Precision | Recall | mAP@50 | mAP@50-95 |
+|--------|-----------:|--------:|--------:|-----------:|
+| `person_without_seatbelt` | 86,5% | 82,3% | 85,5% | 48,3% |
+| `person_with_seatbelt` | 79,2% | 78,7% | 79,0% | 41,7% |
+
+---
+
+### Velocidade de Inferência
+
+| Etapa | Tempo Médio |
+|-------|-------------|
+| Pré-processamento | 0,3 ms |
+| Inferência | 1,6 ms |
+| Pós-processamento (NMS) | 1,1 ms |
+| **Tempo total** | **≈ 3,0 ms/imagem** |
+| **Taxa estimada** | **≈ 333 FPS** |
+
+O modelo apresenta desempenho suficiente para aplicações de detecção em tempo real, processando vídeos de 30 FPS com ampla margem computacional.
+
+---
+
+### Artefatos Gerados
+
+Durante o treinamento, o YOLOv8 gerou automaticamente curvas, métricas e visualizações para análise do desempenho do modelo.
+
+- [Curvas de treinamento](docs/results/results.png)
+- [Curva F1 × Confiança](docs/results/BoxF1_curve.png)
+- [Curva Precision-Recall](docs/results/BoxPR_curve.png)
+- [Matriz de Confusão Normalizada](docs/results/confusion_matrix_normalized.png)
+- [Distribuição das Anotações](docs/results/labels.jpg)
+- [Exemplo de Predições no Conjunto de Validação](docs/results/val_batch0_pred.jpg)
+
+---
+
+### Curvas de Treinamento
+
+[![Curvas de treinamento](docs/results/results.png)](docs/results/results.png)
+
+As perdas (`box_loss`, `cls_loss` e `dfl_loss`) apresentaram convergência estável, enquanto as métricas de validação (`Precision`, `Recall` e `mAP`) aumentaram progressivamente até a convergência próxima à época 44.
+
+---
+
+### Curva F1 × Confiança
+
+[![Curva F1](docs/results/BoxF1_curve.png)](docs/results/BoxF1_curve.png)
+
+A curva F1 indica que o melhor equilíbrio entre precisão e recall ocorre aproximadamente na faixa de confiança entre **0,4 e 0,5**.
+
+---
+
+### Curva Precision-Recall
+
+[![Curva Precision-Recall](docs/results/BoxPR_curve.png)](docs/results/BoxPR_curve.png)
+
+A área sob a curva corresponde a um **mAP@50 de 82,3%**, demonstrando boa capacidade de generalização do modelo.
+
+---
+
+### Matriz de Confusão
+
+[![Matriz de Confusão](docs/results/confusion_matrix_normalized.png)](docs/results/confusion_matrix_normalized.png)
+
+A matriz de confusão normalizada indica:
+
+- **85%** das instâncias de `person_without_seatbelt` foram classificadas corretamente;
+- **89%** das instâncias de `person_with_seatbelt` foram classificadas corretamente;
+- Os principais erros ocorrem em situações de oclusão parcial do cinto ou condições visuais desfavoráveis.
+
+---
+
+### Distribuição do Dataset
+
+[![Distribuição das Anotações](docs/results/labels.jpg)](docs/results/labels.jpg)
+
+Características observadas:
+
+- Dataset relativamente balanceado:
+  - `person_without_seatbelt`: **1.545 instâncias**
+  - `person_with_seatbelt`: **1.950 instâncias**
+- A maioria das bounding boxes está concentrada na região central das imagens;
+- As caixas delimitadoras possuem dimensões relativamente pequenas, tornando a tarefa mais desafiadora para um modelo compacto como o YOLOv8n.
+
+---
+
+### Exemplo de Predições
+
+[![Predições de Validação](docs/results/val_batch0_pred.jpg)](docs/results/val_batch0_pred.jpg)
+
+As imagens acima ilustram exemplos de detecções realizadas pelo modelo no conjunto de validação, evidenciando sua capacidade de localizar e classificar corretamente pessoas utilizando e não utilizando cinto de segurança.
+
+---
+
+### Análise dos Resultados
+
+#### Pontos Fortes
+
+- Modelo compacto (**3 milhões de parâmetros**) e leve (**6,3 MB**);
+- Excelente velocidade de inferência (**≈333 FPS**);
+- Boa capacidade de generalização:
+
+```text
+Precision : 82,9%
+Recall    : 80,5%
+mAP@50    : 82,3%
 ```
+
+- Excelente desempenho na identificação de pessoas sem cinto de segurança (`mAP@50 = 85,5%`), que representa a classe mais crítica para aplicações de fiscalização e monitoramento.
+
+#### Limitações
+
+A classe `person_with_seatbelt` ainda apresenta margem de melhoria:
+
+```text
+mAP@50-95 = 41,7%
+Recall    = 78,7%
+```
+
+Possíveis causas:
+
+- Oclusão parcial do cinto;
+- Diferentes tipos e cores de cintos;
+- Condições de iluminação variadas;
+- Ângulos laterais ou traseiros dos ocupantes.
+
+---
+
+### Trabalhos Futuros
+
+Possíveis estratégias para melhoria:
+
+- Utilizar modelos maiores (`yolov8s` ou `yolov8m`);
+- Expandir o conjunto de dados com mais exemplos de cintos parcialmente visíveis;
+- Incluir cenários noturnos e diferentes condições de iluminação;
+- Aumentar o número de épocas de treinamento (`patience > 30`);
+- Aplicar técnicas adicionais de augmentação voltadas para objetos pequenos e parcialmente ocluídos.
+
+---
+
+### Conclusão
+
+O detector de cintos de segurança baseado em **YOLOv8n** apresentou uma combinação equilibrada entre **precisão, velocidade e baixo custo computacional**. Com **82,3% de mAP@50**, **80,5% de recall** e capacidade de inferência em aproximadamente **3 ms por imagem**, o modelo mostra-se adequado para aplicações de monitoramento em tempo real e pode servir como base para sistemas automáticos de fiscalização do uso de cinto de segurança em veículos.
