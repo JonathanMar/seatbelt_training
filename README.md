@@ -464,3 +464,112 @@ python predict.py --source dataset/test/images/ --name batch_test
 
   ALERTA: 47 deteccoes sem cinto (13.1% do total)!
 ```
+
+---
+
+## Resultados do Treinamento
+
+> **Modelo:** YOLOv8n | **Dataset:** 5.840 treino / 1.110 val | **Hardware:** RTX 2060 SUPER (7.6 GB VRAM)
+
+### Resumo da execucao
+
+| Parametro | Valor |
+|---|---|
+| Epocas executadas | **74** (de 150 configuradas) |
+| Melhor epoca | **44** |
+| Tempo total | **1h 13min** (1.225 horas) |
+| Early Stopping | Ativado: sem melhoria nas ultimas 30 epocas |
+| Tamanho do modelo | 6.3 MB (`best.pt`) |
+| Framework | Ultralytics 8.4.35 + PyTorch 2.11 + CUDA 13.0 |
+
+---
+
+### Metricas finais — split de validacao (best.pt @ epoca 44)
+
+| Classe | Imagens | Instancias | Precision | Recall | mAP@50 | mAP@50-95 |
+|---|---|---|---|---|---|---|
+| **Todas** | 555 | 687 | **0.829** | **0.805** | **0.823** | **0.450** |
+| person_without_seatbelt | 280 | 293 | 0.865 | 0.823 | 0.855 | 0.483 |
+| person_with_seatbelt | 325 | 394 | 0.792 | 0.787 | 0.790 | 0.417 |
+
+### Velocidade de inferencia (por imagem, GPU)
+
+| Etapa | Tempo |
+|---|---|
+| Pre-processamento | 0.3 ms |
+| Inferencia da rede | 1.6 ms |
+| Pos-processamento (NMS) | 1.1 ms |
+| **Total** | **~3.0 ms (~333 FPS)** |
+
+---
+
+### Curvas de treinamento
+
+Metricas de loss (box, cls, dfl) e mAP ao longo das 74 epocas:
+
+![Curvas de loss e metricas](docs/results/results.png)
+
+---
+
+### Curva F1 x Confianca
+
+Pico de F1 em torno de confianca 0.4-0.5:
+
+![BoxF1 curve](docs/results/BoxF1_curve.png)
+
+---
+
+### Curva Precision-Recall
+
+Area sob a curva (mAP@50) de 0.823:
+
+![BoxPR curve](docs/results/BoxPR_curve.png)
+
+---
+
+### Matriz de Confusao Normalizada
+
+![Confusion matrix normalizada](docs/results/confusion_matrix_normalized.png)
+
+---
+
+### Distribuicao das anotacoes no dataset
+
+Distribuicao de classes, posicao e tamanho das bounding boxes:
+
+![Labels distribution](docs/results/labels.jpg)
+
+---
+
+### Predicoes no split de validacao
+
+Exemplo de deteccoes do modelo no batch 0 de validacao:
+
+![Predicoes val batch 0](docs/results/val_batch0_pred.jpg)
+
+---
+
+### Analise dos resultados
+
+**O que funcionou bem:**
+- mAP@50 de **0.823** e Precision de **0.829** indicam um modelo confiavel para deteccao em producao
+- Classe `without_seatbelt` com mAP@50 = **0.855**: o modelo e mais preciso identificando risco
+- Velocidade de **~3 ms/imagem** na GPU permite inferencia em tempo real (video a 30 FPS com ampla margem)
+- Early stopping na epoca 44 indica convergencia saudavel sem overfitting
+
+**Pontos de atencao:**
+- `person_with_seatbelt` tem mAP50-95 menor (0.417 vs 0.483): o cinto e ocluido em algumas angulacoes
+- Recall de 0.805: ~20% das deteccoes sao perdidas — aceitavel para um modelo nano (3M params)
+
+**Para melhorar:**
+- Modelo maior: `yolov8s.pt` ou `yolov8m.pt` com mais dados
+- Mais dados de `person_with_seatbelt` em angulos laterais/traseiros
+- Aumentar `PATIENCE` para 50+ se quiser explorar mais epocas
+
+### Como reproduzir
+
+```bash
+python train.py
+# EarlyStopping ativa automaticamente
+# best.pt salvo em: runs/detect/seatbelt_yolov8n/weights/best.pt
+```
