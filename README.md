@@ -1,40 +1,68 @@
-# Seatbelt Detector - YOLOv8 Training Pipeline
+<div align="center">
 
-Pipeline completo de treinamento, validacao e exportacao de um detector de
-cinto de seguranca usando **YOLOv8n** (Ultralytics).
+# 🚗 Seatbelt Detector
+
+### Sistema de detecção de uso de cinto de segurança em tempo real utilizando YOLOv8
+
+Detecção automática de ocupantes utilizando e não utilizando cinto de segurança por meio de visão computacional e aprendizado profundo.
+
+**Treinado com PyTorch e Ultralytics YOLOv8, com suporte a GPU, exportação para ONNX e inferência em tempo real.**
+
+<p>
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img src="https://img.shields.io/badge/PyTorch-2.11+-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white">
+  <img src="https://img.shields.io/badge/YOLOv8-Ultralytics-111F68?style=for-the-badge">
+  <img src="https://img.shields.io/badge/CUDA-13.0-76B900?style=for-the-badge&logo=nvidia&logoColor=white">
+  <img src="https://img.shields.io/badge/mAP@50-82.3%25-success?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Inference-333%20FPS-success?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Dataset-7%2C256%20images-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
+</p>
+
+</div>
 
 ---
 
-## Sumario
+## ✨ Funcionalidades
 
-1. [Visao geral](#visao-geral)
-2. [Estrutura do projeto](#estrutura-do-projeto)
-3. [Hardware testado](#hardware-testado)
-4. [Requisitos](#requisitos)
-5. [Instalacao](#instalacao)
-6. [Dataset](#dataset)
-7. [Configuracao](#configuracao)
-8. [Uso](#uso)
-9. [Hiperparametros](#hiperparametros)
-10. [Resultados esperados](#resultados-esperados)
-11. [Exportacao para producao](#exportacao-para-producao)
-12. [Boas praticas aplicadas](#boas-praticas-aplicadas)
+- 🚗 Detecção de pessoas utilizando e não utilizando cinto de segurança
+- ⚡ Inferência em tempo real (~333 FPS em GPU)
+- 🧠 Treinamento utilizando YOLOv8n e PyTorch
+- 📦 Exportação para ONNX
+- 🎯 Avaliação automática com Precision, Recall e mAP
+- 📊 Curvas de treinamento e matriz de confusão
+- 🖥️ Suporte a imagens, vídeos, webcams e diretórios inteiros
+- 🔬 Projeto reproduzível com hiperparâmetros centralizados em `config.py`
 
 ---
 
-## Visao geral
+## 🔗 Links Rápidos
+
+- [Instalação](#instalacao)
+- [Dataset](#dataset)
+- [Uso](#uso)
+- [Resultados do Treinamento](#resultados-do-treinamento)
+- [Exportação para Produção](#exportacao-para-producao)
+- [Releases](https://github.com/JonathanMar/seatbelt-detector/releases)
+
+---
+
+## 📌 Visão Geral
 
 | Item | Detalhe |
-|---|---|
-| Tarefa | Deteccao de objetos (Object Detection) |
-| Modelo | YOLOv8n (nano, 3.2 M parametros) |
-| Framework | Ultralytics 8.4.35 + PyTorch 2.11 (CUDA 13.0) |
+|------|----------|
+| Tarefa | Object Detection |
+| Modelo | YOLOv8n (3,0M parâmetros) |
+| Framework | Ultralytics 8.4.35 + PyTorch 2.11 + CUDA 13.0 |
 | Classes | `person_without_seatbelt` / `person_with_seatbelt` |
-| Formato de exportacao | ONNX (opset 17, batch dinamico) |
+| Dataset | 7.256 imagens |
+| Melhor mAP@50 | **82,3%** |
+| Velocidade de Inferência | **≈333 FPS** |
+| Exportação | ONNX (opset 17, batch dinâmico) |
 
 ---
 
-## Estrutura do projeto
+## 🗂️ Estrutura do Projeto
 
 ```
 seatbelt_training/
@@ -68,13 +96,13 @@ seatbelt_training/
 ```
 
 > **Nota sobre `_data_resolved.yaml`:**
-> O Ultralytics resolve o campo `path:` do data.yaml relativo ao CWD, nao ao
+> O Ultralytics resolve o campo `path:` do data.yaml relativo ao CWD, não ao
 > diretorio do YAML. Para evitar erros de "images not found", o `config.py`
 > gera este arquivo com o caminho absoluto correto em cada execucao.
 
 ---
 
-## Hardware testado
+## 🖥️ Hardware Testado
 
 | Componente | Especificacao |
 |---|---|
@@ -89,7 +117,7 @@ seatbelt_training/
 
 ---
 
-## Requisitos
+## 📋 Requisitos
 
 - Python **3.10+**
 - CUDA **12.x** ou superior (para GPU)
@@ -97,11 +125,11 @@ seatbelt_training/
 
 ---
 
-## Instalacao
+## ⚙️ Instalação
 
 ```bash
 # 1. Clonar o repositorio
-git clone <url-do-repositorio>
+git clone https://github.com/JonathanMar/seatbelt-training.git
 cd seatbelt_training
 
 # 2. Criar e ativar ambiente virtual
@@ -120,7 +148,7 @@ pip install -r requirements.txt
 
 ---
 
-## Dataset
+## 🗃️ Dataset
 
 ### Formato YOLO
 
@@ -154,11 +182,11 @@ Todos os valores em coordenadas normalizadas (0.0 a 1.0).
 1. Coloque imagens em `dataset/train/images/` e anotacoes em `dataset/train/labels/`
 2. Repita para `valid/` e `test/`
 3. Ajuste `nc` e `names` em `config.py` (funcao `build_dataset_yaml`) se as classes mudarem
-4. Nao e necessario editar `data.yaml` manualmente
+4. Não e necessario editar `data.yaml` manualmente
 
 ---
 
-## Configuracao
+## 🔧 Configuração
 
 Toda a configuracao esta centralizada em `config.py`.
 **Nenhum hiperparametro esta hardcoded nos scripts de treino.**
@@ -186,7 +214,7 @@ AMP = True
 
 ---
 
-## Uso
+## 🚀 Uso
 
 ### Treinar
 
@@ -214,7 +242,7 @@ python validate.py --split test
 # Avaliar um modelo especifico
 python validate.py --model runs/seatbelt_yolov8n/weights/last.pt
 
-# Combinar opcoes
+# Combinar opções
 python validate.py --model runs/seatbelt_yolov8n/weights/best.pt --split test
 ```
 
@@ -236,7 +264,7 @@ Saida esperada:
 ### Exportar para ONNX
 
 ```bash
-# Exportar best.pt com configuracoes padrao
+# Exportar best.pt com configurações padrão
 python export_onnx.py
 
 # Personalizar modelo, resolucao e opset
@@ -247,7 +275,7 @@ O arquivo `.onnx` e salvo no mesmo diretorio do `.pt`.
 
 ---
 
-### Benchmark de batch
+## ⚡ Benchmark de Batch
 
 ```bash
 python benchmark.py
@@ -265,7 +293,7 @@ e para no primeiro OOM, reportando o maior valor seguro:
 
 ---
 
-## Hiperparametros
+## 🎯 Hiperparâmetros
 
 ### Otimizador (AdamW + Cosine Annealing)
 
@@ -315,7 +343,7 @@ Com os 5.840 exemplos de treino e os hiperparametros configurados:
 
 ---
 
-## Exportacao para producao
+## 📦 Exportação para Produção
 
 Apos exportar com `python export_onnx.py`, o modelo pode ser usado com:
 
@@ -352,7 +380,7 @@ results = model.predict("frame.jpg", conf=0.5)
 
 ---
 
-## Boas praticas aplicadas
+## 🛠️ Boas Práticas Aplicadas
 
 | Pratica | Implementacao |
 |---|---|
@@ -369,7 +397,7 @@ results = model.predict("frame.jpg", conf=0.5)
 
 ---
 
-## Inferencia (Teste do Modelo)
+## 🔍 Inferência (Teste do Modelo)
 
 Apos o treinamento, use `predict.py` para testar o modelo em imagens,
 videos, webcam ou pastas inteiras. Os resultados sao salvos em `runs/predict/`.
@@ -467,7 +495,7 @@ python predict.py --source dataset/test/images/ --name batch_test
 
 ---
 
-## Resultados do Treinamento
+## 📊 Resultados do Treinamento
 
 > **Modelo:** YOLOv8n | **Dataset:** 5.840 treino / 1.110 val | **Hardware:** RTX 2060 SUPER (7.6 GB VRAM)
 
@@ -547,128 +575,6 @@ Exemplo de deteccoes do modelo no batch 0 de validacao:
 
 ![Predicoes val batch 0](docs/results/val_batch0_pred.jpg)
 
----
-## Resultados do Treinamento
-
-> **Modelo:** YOLOv8n  
-> **Dataset:** 5.840 imagens de treino, 1.110 imagens de validação e 306 imagens de teste  
-> **Hardware:** NVIDIA GeForce RTX 2060 SUPER (7.6 GB VRAM)
-
-### Resumo da Execução
-
-| Parâmetro | Valor |
-|-----------|--------|
-| Épocas configuradas | 150 |
-| Épocas executadas | **74** |
-| Melhor época | **44** |
-| Early Stopping | Ativado (30 épocas sem melhoria) |
-| Tempo total de treinamento | **1,225 horas (~73,5 minutos)** |
-| Tamanho do modelo (`best.pt`) | **6,3 MB** |
-| Framework | Ultralytics 8.4.35 + PyTorch 2.11 + CUDA 13.0 |
-
----
-
-### Métricas Finais (Validação)
-
-#### Desempenho Geral
-
-| Métrica | Valor |
-|---------|--------|
-| Precision | **82,9%** |
-| Recall | **80,5%** |
-| mAP@50 | **82,3%** |
-| mAP@50-95 | **45,0%** |
-
-#### Desempenho por Classe
-
-| Classe | Precision | Recall | mAP@50 | mAP@50-95 |
-|--------|-----------:|--------:|--------:|-----------:|
-| `person_without_seatbelt` | 86,5% | 82,3% | 85,5% | 48,3% |
-| `person_with_seatbelt` | 79,2% | 78,7% | 79,0% | 41,7% |
-
----
-
-### Velocidade de Inferência
-
-| Etapa | Tempo Médio |
-|-------|-------------|
-| Pré-processamento | 0,3 ms |
-| Inferência | 1,6 ms |
-| Pós-processamento (NMS) | 1,1 ms |
-| **Tempo total** | **≈ 3,0 ms/imagem** |
-| **Taxa estimada** | **≈ 333 FPS** |
-
-O modelo apresenta desempenho suficiente para aplicações de detecção em tempo real, processando vídeos de 30 FPS com ampla margem computacional.
-
----
-
-### Artefatos Gerados
-
-Durante o treinamento, o YOLOv8 gerou automaticamente curvas, métricas e visualizações para análise do desempenho do modelo.
-
-- [Curvas de treinamento](docs/results/results.png)
-- [Curva F1 × Confiança](docs/results/BoxF1_curve.png)
-- [Curva Precision-Recall](docs/results/BoxPR_curve.png)
-- [Matriz de Confusão Normalizada](docs/results/confusion_matrix_normalized.png)
-- [Distribuição das Anotações](docs/results/labels.jpg)
-- [Exemplo de Predições no Conjunto de Validação](docs/results/val_batch0_pred.jpg)
-
----
-
-### Curvas de Treinamento
-
-[![Curvas de treinamento](docs/results/results.png)](docs/results/results.png)
-
-As perdas (`box_loss`, `cls_loss` e `dfl_loss`) apresentaram convergência estável, enquanto as métricas de validação (`Precision`, `Recall` e `mAP`) aumentaram progressivamente até a convergência próxima à época 44.
-
----
-
-### Curva F1 × Confiança
-
-[![Curva F1](docs/results/BoxF1_curve.png)](docs/results/BoxF1_curve.png)
-
-A curva F1 indica que o melhor equilíbrio entre precisão e recall ocorre aproximadamente na faixa de confiança entre **0,4 e 0,5**.
-
----
-
-### Curva Precision-Recall
-
-[![Curva Precision-Recall](docs/results/BoxPR_curve.png)](docs/results/BoxPR_curve.png)
-
-A área sob a curva corresponde a um **mAP@50 de 82,3%**, demonstrando boa capacidade de generalização do modelo.
-
----
-
-### Matriz de Confusão
-
-[![Matriz de Confusão](docs/results/confusion_matrix_normalized.png)](docs/results/confusion_matrix_normalized.png)
-
-A matriz de confusão normalizada indica:
-
-- **85%** das instâncias de `person_without_seatbelt` foram classificadas corretamente;
-- **89%** das instâncias de `person_with_seatbelt` foram classificadas corretamente;
-- Os principais erros ocorrem em situações de oclusão parcial do cinto ou condições visuais desfavoráveis.
-
----
-
-### Distribuição do Dataset
-
-[![Distribuição das Anotações](docs/results/labels.jpg)](docs/results/labels.jpg)
-
-Características observadas:
-
-- Dataset relativamente balanceado:
-  - `person_without_seatbelt`: **1.545 instâncias**
-  - `person_with_seatbelt`: **1.950 instâncias**
-- A maioria das bounding boxes está concentrada na região central das imagens;
-- As caixas delimitadoras possuem dimensões relativamente pequenas, tornando a tarefa mais desafiadora para um modelo compacto como o YOLOv8n.
-
----
-
-### Exemplo de Predições
-
-[![Predições de Validação](docs/results/val_batch0_pred.jpg)](docs/results/val_batch0_pred.jpg)
-
 As imagens acima ilustram exemplos de detecções realizadas pelo modelo no conjunto de validação, evidenciando sua capacidade de localizar e classificar corretamente pessoas utilizando e não utilizando cinto de segurança.
 
 ---
@@ -716,6 +622,48 @@ Possíveis estratégias para melhoria:
 - Incluir cenários noturnos e diferentes condições de iluminação;
 - Aumentar o número de épocas de treinamento (`patience > 30`);
 - Aplicar técnicas adicionais de augmentação voltadas para objetos pequenos e parcialmente ocluídos.
+
+---
+---
+
+## 📦 Releases
+
+Os pesos treinados, modelos exportados e artefatos de treinamento estão disponíveis na página de releases:
+
+- [Releases](https://github.com/JonathanMar/seatbelt-detector/releases)
+
+Arquivos disponibilizados:
+
+- `best.pt`
+- `best.onnx`
+- `results.png`
+- `confusion_matrix_normalized.png`
+- `BoxF1_curve.png`
+- `BoxPR_curve.png`
+- `labels.jpg`
+- `val_batch0_pred.jpg`
+
+---
+
+## 📚 Citation
+
+Se este projeto for utilizado em pesquisas ou trabalhos acadêmicos, cite:
+
+```bibtex
+@misc{marcon2026seatbeltdetector,
+  author = {Jonathan Marcon},
+  title = {Seatbelt Detector: Real-Time Seatbelt Detection Using YOLOv8},
+  year = {2026},
+  publisher = {GitHub},
+  url = {https://github.com/JonathanMar/seatbelt-detector}
+}
+```
+
+---
+
+## 📄 License
+
+Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais informações.
 
 ---
 
